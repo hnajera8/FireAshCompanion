@@ -37,6 +37,12 @@ jobs:
         run: |
           sed -i 's/compileSdk 37/compileSdk 35/' app/build.gradle
       
+      - name: Configure AndroidX
+        working-directory: project/FireAshCompanion_phonebuild
+        run: |
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
+
       - name: Build APK
         working-directory: project/FireAshCompanion_phonebuild
         run: gradle :app:assembleDebug
