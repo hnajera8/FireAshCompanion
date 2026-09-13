@@ -27,12 +27,17 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Fix project Gradle version
+        working-directory: project/FireAshCompanion_phonebuild
+        run: |
+          sed -i "s/version '9.4.0'/version '8.7.3'/" ../FireAshCompanion_phonebuild/build.gradle
+
       - name: Build APK
-        working-directory: project
+        working-directory: project/FireAshCompanion_phonebuild
         run: gradle :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: FireAshCompanion-APK
-          path: project/app/build/outputs/apk/debug/app-debug.apk
+          path: project/FireAshCompanion_phonebuild/app/build/outputs/apk/debug/app-debug.apk
