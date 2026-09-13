@@ -16,6 +16,16 @@ jobs:
           mkdir project
           unzip -q FireAshCompanion_OCR.zip -d project
 
+          PROJECT_DIR=$(find project -name settings.gradle -type f -printf '%h\n' | head -n 1)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "ERROR: No se encontró settings.gradle"
+            exit 1
+          fi
+
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Proyecto encontrado en: $PROJECT_DIR"
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -27,28 +37,21 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Fix project Gradle version
-        working-directory: project/FireAshCompanion_phonebuild
-        run: |
-          sed -i "s/version '9.4.0'/version '8.7.3'/" ../FireAshCompanion_phonebuild/build.gradle
-
       - name: Use Android SDK 35
-        working-directory: project/FireAshCompanion_phonebuild
         run: |
-          sed -i 's/compileSdk 37/compileSdk 35/' app/build.gradle
-      
+          sed -i 's/compileSdk 37/compileSdk 35/' "$PROJECT_DIR/app/build.gradle"
+
       - name: Configure AndroidX
-        working-directory: project/FireAshCompanion_phonebuild
         run: |
-          echo "android.useAndroidX=true" >> gradle.properties
-          echo "android.enableJetifier=true" >> gradle.properties
+          echo "android.useAndroidX=true" >> "$PROJECT_DIR/gradle.properties"
+          echo "android.enableJetifier=true" >> "$PROJECT_DIR/gradle.properties"
 
       - name: Build APK
-        working-directory: project/FireAshCompanion_phonebuild
+        working-directory: ${{ env.PROJECT_DIR }}
         run: gradle :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: FireAshCompanion-APK
-          path: project/FireAshCompanion_phonebuild/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
