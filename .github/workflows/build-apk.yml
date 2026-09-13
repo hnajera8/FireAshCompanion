@@ -32,6 +32,11 @@ jobs:
         run: |
           sed -i "s/version '9.4.0'/version '8.7.3'/" ../FireAshCompanion_phonebuild/build.gradle
 
+      - name: Use Android SDK 35
+        working-directory: project/FireAshCompanion_phonebuild
+        run: |
+          sed -i 's/compileSdk 37/compileSdk 35/' app/build.gradle
+      
       - name: Build APK
         working-directory: project/FireAshCompanion_phonebuild
         run: gradle :app:assembleDebug
